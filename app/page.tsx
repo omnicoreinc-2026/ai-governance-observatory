@@ -264,6 +264,10 @@ export default function Page() {
         .ao-fw-grid { display: grid; grid-template-columns: 2.2fr 1fr 0.8fr 1fr 0.7fr 2fr; gap: 12px; padding: 14px 20px; align-items: center; font-size: 13px; }
         .ao-vendor-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
         .ao-vendor-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .ao-source-link { display: inline-flex; align-items: center; gap: 4px; color: var(--text-3); text-decoration: none; transition: color 0.15s; }
+        .ao-source-link:hover { color: var(--accent); }
+        .ao-title-link { font-weight: 600; color: var(--text-0); text-decoration: none; transition: color 0.15s; line-height: 1.4; }
+        .ao-title-link:hover { color: var(--accent); }
         ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
         .ao-noise { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -327,7 +331,7 @@ export default function Page() {
                   {a.vendor && <span style={{ fontSize: 11, fontFamily: "var(--mono)", color: VENDORS_DATA.find(v=>v.name===a.vendor)?.color }}>{a.vendor}</span>}
                   <span style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--text-3)", marginLeft: "auto" }}>{ago(a.ts)}</span>
                 </div>
-                <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text-0)", marginBottom: 6, lineHeight: 1.4 }}>{a.title}</div>
+                {a.url ? <a href={a.url} target="_blank" rel="noopener noreferrer" className="ao-title-link" style={{ fontSize: 14, display: "block", marginBottom: 6 }}>{a.title} <ExternalLink size={11} style={{ display: "inline", verticalAlign: "middle", opacity: 0.5 }} /></a> : <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text-0)", marginBottom: 6, lineHeight: 1.4 }}>{a.title}</div>}
                 <div style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.55 }}>{a.summary}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 10, fontFamily: "var(--mono)", color: "var(--text-3)", marginTop: 8 }}>
                   {a.url ? <a href={a.url} target="_blank" rel="noopener noreferrer" className="ao-source-link" onClick={e => e.stopPropagation()}><ExternalLink size={9} /> {a.source}</a> : <span>{a.source}</span>}
@@ -451,7 +455,7 @@ export default function Page() {
                     <span style={{ fontSize: 10, fontFamily: "var(--mono)", color: "var(--text-3)", marginLeft: "auto" }}>{ago(a.ts)}</span>
                     <ChevronDown size={14} style={{ color: "var(--text-3)", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
                   </div>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text-0)", lineHeight: 1.4 }}>{a.title}</div>
+                  {a.url ? <a href={a.url} target="_blank" rel="noopener noreferrer" className="ao-title-link" style={{ fontSize: 14, display: "block" }} onClick={e => e.stopPropagation()}>{a.title} <ExternalLink size={11} style={{ display: "inline", verticalAlign: "middle", opacity: 0.5 }} /></a> : <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text-0)", lineHeight: 1.4 }}>{a.title}</div>}
                   {isOpen && (<div style={{ animation: "fadeUp 0.2s ease" }}>
                     <div style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6, marginTop: 8, marginBottom: 12 }}>{a.summary}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 10, fontFamily: "var(--mono)", color: "var(--text-3)" }}>
