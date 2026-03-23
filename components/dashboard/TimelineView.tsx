@@ -23,17 +23,24 @@ const EVENT_ICONS: Record<TimelineEventType, typeof Scale> = {
 
 export function TimelineView(): JSX.Element {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("timeline_events")
         .select("*")
         .order("event_date", { ascending: false });
+      if (error) { console.error('Failed to fetch timeline events:', error); setLoading(false); return; }
       setEvents(data ?? []);
+      setLoading(false);
     }
     load();
   }, []);
+
+  if (loading) {
+    return <div className="py-12 text-center text-sm text-[#71717A]">Loading...</div>;
+  }
 
   return (
     <div className="space-y-4">

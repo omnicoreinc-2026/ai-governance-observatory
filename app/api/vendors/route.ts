@@ -11,17 +11,18 @@ export async function GET(): Promise<NextResponse> {
       .order("transparency_score", { ascending: false });
 
     if (error) {
+      console.error("[VENDORS] Supabase query error:", error.message);
       return NextResponse.json(
-        { status: "error", message: error.message },
+        { status: "error", message: "Failed to fetch vendors" },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ status: "success", data });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+    console.error("[VENDORS] Unexpected error:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
-      { status: "error", message },
+      { status: "error", message: "Internal server error" },
       { status: 500 }
     );
   }

@@ -164,7 +164,7 @@ const feedSources = [
 
 const vendors = [
   {
-    name: "openai",
+    name: "OpenAI",
     display_name: "OpenAI",
     models: "GPT-5, o3, o4-mini, DALL-E 4",
     color: "#10A37F",
@@ -179,7 +179,7 @@ const vendors = [
     risk_level: "medium",
   },
   {
-    name: "anthropic",
+    name: "Anthropic",
     display_name: "Anthropic",
     models: "Claude 4.6 Opus, Claude 4.6 Sonnet, Claude Haiku 4.5",
     color: "#D4A574",
@@ -194,7 +194,7 @@ const vendors = [
     risk_level: "low",
   },
   {
-    name: "google_deepmind",
+    name: "Google DeepMind",
     display_name: "Google DeepMind",
     models: "Gemini 2.5 Pro, Gemini 2.5 Flash",
     color: "#4285F4",
@@ -209,7 +209,7 @@ const vendors = [
     risk_level: "medium",
   },
   {
-    name: "meta_ai",
+    name: "Meta AI",
     display_name: "Meta AI",
     models: "Llama 4, Llama 4 Scout/Maverick",
     color: "#0668E1",
@@ -224,7 +224,7 @@ const vendors = [
     risk_level: "high",
   },
   {
-    name: "microsoft",
+    name: "Microsoft",
     display_name: "Microsoft",
     models: "Copilot, Azure AI, Azure OpenAI Service",
     color: "#00BCF2",
@@ -239,7 +239,7 @@ const vendors = [
     risk_level: "medium",
   },
   {
-    name: "xai",
+    name: "xAI",
     display_name: "xAI",
     models: "Grok 3, Grok 3 Mini",
     color: "#1DA1F2",
@@ -251,6 +251,36 @@ const vendors = [
     military_use: "DoD contract awarded (2025)",
     agentic_controls: "Grok agent features emerging",
     transparency_score: 20,
+    risk_level: "high",
+  },
+  {
+    name: "Mistral",
+    display_name: "Mistral AI",
+    models: "Mistral Large, Mistral Medium, Mistral Small, Codestral",
+    color: "#FF7000",
+    safety_policy: "Usage Policy + moderation guardrails",
+    red_teaming: "Internal safety evaluations",
+    content_filtering: "Moderation API and system-level guardrails",
+    bias_audits: "Published model cards with benchmark results",
+    incident_response: "Security contact and disclosure process",
+    military_use: "No public DoD contracts; EU-based focus",
+    agentic_controls: "Function calling safety layers",
+    transparency_score: 50,
+    risk_level: "medium",
+  },
+  {
+    name: "DeepSeek",
+    display_name: "DeepSeek",
+    models: "DeepSeek-V3, DeepSeek-R1, DeepSeek-Coder-V2",
+    color: "#4A6CF7",
+    safety_policy: "Basic usage terms; limited public safety documentation",
+    red_teaming: "Internal testing; limited external transparency",
+    content_filtering: "Content moderation with Chinese regulatory compliance",
+    bias_audits: "Benchmark results published; no independent bias audits",
+    incident_response: "No published incident response program",
+    military_use: "Subject to Chinese government directives",
+    agentic_controls: "Limited agent-specific safety controls",
+    transparency_score: 25,
     risk_level: "high",
   },
 ];
@@ -453,8 +483,11 @@ async function seed() {
     else console.log(`  OK: ${fw.name}`);
   }
 
-  // Timeline Events
-  console.log("\n[SEED] Inserting timeline events...");
+  // Timeline Events — clear existing before re-seeding (no unique constraint for upsert)
+  console.log("\n[SEED] Clearing existing timeline events...");
+  await supabase.from("timeline_events").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
+  console.log("[SEED] Inserting timeline events...");
   for (const event of timelineEvents) {
     const { error } = await supabase.from("timeline_events").insert(event);
     if (error && !error.message.includes("duplicate"))
@@ -465,4 +498,4 @@ async function seed() {
   console.log("\n[SEED] Complete.");
 }
 
-seed().catch(console.error);
+seed().catch((e) => { console.error(e); process.exit(1); });

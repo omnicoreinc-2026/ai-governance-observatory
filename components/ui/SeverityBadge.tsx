@@ -1,5 +1,3 @@
-"use client";
-
 import { SEVERITY_COLORS, SEVERITY_LABELS } from "@/lib/utils/constants";
 import type { AlertSeverity } from "@/lib/supabase/types";
 

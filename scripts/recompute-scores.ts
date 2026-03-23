@@ -42,7 +42,7 @@ async function recomputeScores(): Promise<void> {
     `\n[SCORE] Complete. Updated: ${updated}, Errors: ${errors}`
   );
 
-  await supabase.from("audit_log").insert({
+  const { error: auditError } = await supabase.from("audit_log").insert({
     action: "score_recompute",
     details: { total: alerts.length, updated, errors },
     source: "script:recompute-scores",
@@ -51,6 +51,9 @@ async function recomputeScores(): Promise<void> {
     errors,
     duration_ms: Date.now() - startTime,
   });
+  if (auditError) {
+    console.error("[SCORE] Failed to write audit_log:", auditError.message);
+  }
 }
 
-recomputeScores().catch(console.error);
+recomputeScores().catch((e) => { console.error(e); process.exit(1); });

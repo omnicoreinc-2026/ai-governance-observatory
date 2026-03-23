@@ -18,6 +18,7 @@ export function NavItem({
   return (
     <button
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       className={`flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm transition-colors ${
         active
           ? "bg-white/[0.06] text-[#FAFAFA]"

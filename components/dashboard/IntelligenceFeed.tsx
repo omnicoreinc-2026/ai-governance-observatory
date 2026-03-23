@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useDeferredValue } from "react";
 import { Search, Filter, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { SeverityBadge } from "@/components/ui/SeverityBadge";
@@ -13,6 +13,24 @@ import {
 import { timeAgo } from "@/lib/utils/dates";
 import type { Alert, AlertSeverity, AlertCategory } from "@/lib/supabase/types";
 
+/** Escape PostgREST special characters to prevent filter injection. */
+function sanitizePostgrestSearch(input: string): string {
+  return input.replace(/[.,()%*\\]/g, "");
+}
+
+/** Validate that a URL uses a safe protocol. */
+function safeHref(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return url;
+    }
+    return "#";
+  } catch {
+    return "#";
+  }
+}
+
 export function IntelligenceFeed(): JSX.Element {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [total, setTotal] = useState(0);
@@ -22,6 +40,7 @@ export function IntelligenceFeed(): JSX.Element {
   const [newOnly, setNewOnly] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const fetchAlerts = useCallback(async () => {
     setLoading(true);
@@ -35,17 +54,20 @@ export function IntelligenceFeed(): JSX.Element {
     if (severityFilter) query = query.eq("severity", severityFilter);
     if (categoryFilter) query = query.eq("category", categoryFilter);
     if (newOnly) query = query.eq("is_new", true);
-    if (searchQuery) {
-      query = query.or(
-        `title.ilike.%${searchQuery}%,summary.ilike.%${searchQuery}%`
-      );
+    if (deferredSearchQuery) {
+      const sanitized = sanitizePostgrestSearch(deferredSearchQuery);
+      if (sanitized) {
+        query = query.or(
+          `title.ilike.%${sanitized}%,summary.ilike.%${sanitized}%`
+        );
+      }
     }
 
     const { data, count } = await query;
     setAlerts(data ?? []);
     setTotal(count ?? 0);
     setLoading(false);
-  }, [severityFilter, categoryFilter, newOnly, searchQuery]);
+  }, [severityFilter, categoryFilter, newOnly, deferredSearchQuery]);
 
   useEffect(() => {
     fetchAlerts();
@@ -62,6 +84,7 @@ export function IntelligenceFeed(): JSX.Element {
             placeholder="Search alerts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search alerts"
             className="w-full rounded-[10px] border border-white/[0.06] bg-[#0F0F12] py-2 pl-9 pr-4 text-sm text-[#D4D4D8] placeholder-[#71717A] outline-none focus:border-[#38BDF8]/50"
           />
         </div>
@@ -71,6 +94,7 @@ export function IntelligenceFeed(): JSX.Element {
           onChange={(e) =>
             setSeverityFilter(e.target.value as AlertSeverity | "")
           }
+          aria-label="Filter by severity"
           className="rounded-[10px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2 text-sm text-[#D4D4D8] outline-none"
         >
           <option value="">All Severities</option>
@@ -86,6 +110,7 @@ export function IntelligenceFeed(): JSX.Element {
           onChange={(e) =>
             setCategoryFilter(e.target.value as AlertCategory | "")
           }
+          aria-label="Filter by category"
           className="rounded-[10px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2 text-sm text-[#D4D4D8] outline-none"
         >
           <option value="">All Categories</option>
@@ -98,6 +123,7 @@ export function IntelligenceFeed(): JSX.Element {
 
         <button
           onClick={() => setNewOnly(!newOnly)}
+          aria-pressed={newOnly}
           className={`rounded-[10px] border px-3 py-2 text-sm transition-colors ${
             newOnly
               ? "border-[#38BDF8]/50 bg-[#38BDF8]/10 text-[#38BDF8]"
@@ -135,6 +161,7 @@ export function IntelligenceFeed(): JSX.Element {
                 onClick={() =>
                   setExpandedId(expandedId === alert.id ? null : alert.id)
                 }
+                aria-expanded={expandedId === alert.id}
                 className="flex w-full items-center gap-4 p-4 text-left"
               >
                 <div className="flex-1 min-w-0">
@@ -194,7 +221,7 @@ export function IntelligenceFeed(): JSX.Element {
                     ))}
                     {alert.source_url && (
                       <a
-                        href={alert.source_url}
+                        href={safeHref(alert.source_url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="ml-auto flex items-center gap-1 text-xs text-[#38BDF8] hover:underline"

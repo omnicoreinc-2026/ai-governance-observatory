@@ -142,11 +142,11 @@ export const CATEGORY_KEYWORDS: Record<string, string[]> = {
   ],
 };
 
-export function detectSeverity(text: string): string {
+export function detectSeverity(text: string): 'critical' | 'high' | 'medium' | 'low' | 'info' {
   const lower = text.toLowerCase();
   for (const [severity, keywords] of Object.entries(GOVERNANCE_KEYWORDS)) {
     for (const kw of keywords) {
-      if (lower.includes(kw)) return severity;
+      if (lower.includes(kw)) return severity as 'critical' | 'high' | 'medium' | 'low';
     }
   }
   return "info";
@@ -162,7 +162,10 @@ export function detectVendor(text: string): string | null {
   return null;
 }
 
-export function detectCategory(text: string, defaultCat: string): string {
+export function detectCategory(
+  text: string,
+  defaultCat: string,
+): 'regulatory' | 'vendor_guardrails' | 'frameworks' | 'safety_research' | 'enforcement' | 'standards' | string {
   const lower = text.toLowerCase();
   let bestMatch = defaultCat;
   let bestScore = 0;
@@ -193,7 +196,7 @@ export function extractTags(text: string): string[] {
   if (lower.includes("surveillance")) tags.add("Surveillance");
   if (lower.includes("bias")) tags.add("Bias");
   if (lower.includes("transparency")) tags.add("Transparency");
-  if (lower.includes("agentic") || lower.includes("agent"))
+  if (lower.includes("agentic") || lower.includes("ai agent"))
     tags.add("Agentic AI");
   if (lower.includes("open source") || lower.includes("open weight"))
     tags.add("Open Source");

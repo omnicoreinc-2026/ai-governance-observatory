@@ -12,7 +12,17 @@
 // =============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import { refreshAllFeeds } from "@/lib/ingestion/engine";
+
+/** Timing-safe string comparison. Returns false if either value is undefined/empty. */
+function safeCompare(a: string | undefined, b: string | undefined): boolean {
+  if (!a || !b) return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
 
 // Vercel Cron requires this config for the runtime
 export const maxDuration = 300; // 5 minutes max
@@ -21,10 +31,11 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   // Verify cron secret (Vercel sets CRON_SECRET automatically)
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const expectedBearer = process.env.CRON_SECRET ? `Bearer ${process.env.CRON_SECRET}` : undefined;
+  if (!safeCompare(authHeader ?? undefined, expectedBearer)) {
     // Also allow manual triggers with API key during development
     const apiKey = request.headers.get("x-api-key");
-    if (apiKey !== process.env.ADMIN_API_KEY) {
+    if (!safeCompare(apiKey ?? undefined, process.env.ADMIN_API_KEY)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
@@ -56,14 +67,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error("[CRON] Fatal error:", message);
+    console.error("[CRON] Fatal error:", error instanceof Error ? error.message : String(error));
 
     return NextResponse.json(
       {
         status: "error",
         timestamp: new Date().toISOString(),
-        error: message,
+        error: "Internal server error",
       },
       { status: 500 }
     );

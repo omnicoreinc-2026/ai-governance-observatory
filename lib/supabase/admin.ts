@@ -1,3 +1,7 @@
+if (typeof window !== "undefined") {
+  throw new Error("supabaseAdmin cannot be used in client code");
+}
+
 import { createClient } from "@supabase/supabase-js";
 
 export const supabaseAdmin = createClient(

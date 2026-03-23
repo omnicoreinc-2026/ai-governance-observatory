@@ -8,7 +8,7 @@
 
 import Parser from "rss-parser";
 import * as cheerio from "cheerio";
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
   detectSeverity,
@@ -134,9 +134,14 @@ async function scrapeFeed(source: FeedSource): Promise<IngestedItem[]> {
 
       if (title && title.length > 10) {
         const combined = `${title} ${summary}`;
-        const fullUrl = link?.startsWith("http")
-          ? link
-          : `${new URL(source.url).origin}${link}`;
+        let fullUrl: string;
+        try {
+          fullUrl = link
+            ? (link.startsWith("http") ? link : `${new URL(source.url).origin}${link}`)
+            : source.url;
+        } catch {
+          fullUrl = source.url;
+        }
 
         items.push({
           title,
@@ -146,7 +151,15 @@ async function scrapeFeed(source: FeedSource): Promise<IngestedItem[]> {
           category: detectCategory(combined, source.default_category),
           severity: detectSeverity(combined),
           vendor: detectVendor(combined),
-          published_at: dateStr ? new Date(dateStr).toISOString() : null,
+          published_at: (() => {
+            if (!dateStr) return null;
+            try {
+              const d = new Date(dateStr);
+              return isNaN(d.getTime()) ? null : d.toISOString();
+            } catch {
+              return null;
+            }
+          })(),
           tags: extractTags(combined),
           raw_data: { scraped_from: source.url },
         });
@@ -167,27 +180,39 @@ async function scrapeFeed(source: FeedSource): Promise<IngestedItem[]> {
 async function isDuplicate(url: string, sourceId: string): Promise<boolean> {
   const urlHash = hashUrl(url);
 
-  const { data } = await supabaseAdmin
+  const { data, error: selectError } = await supabaseAdmin
     .from("ingested_urls")
     .select("url_hash")
     .eq("url_hash", urlHash)
     .single();
 
+  if (selectError && selectError.code !== "PGRST116") {
+    // PGRST116 = no rows found, which is expected for non-duplicates
+    console.error("[DEDUP] Error checking duplicate:", selectError);
+    return false; // Treat as non-duplicate to avoid data loss
+  }
+
   if (data) {
     // Update last_seen
-    await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin
       .from("ingested_urls")
       .update({ last_seen: new Date().toISOString() })
       .eq("url_hash", urlHash);
+    if (updateError) {
+      console.error("[DEDUP] Error updating last_seen:", updateError);
+    }
     return true;
   }
 
   // Record new URL
-  await supabaseAdmin.from("ingested_urls").insert({
+  const { error: insertError } = await supabaseAdmin.from("ingested_urls").insert({
     url_hash: urlHash,
     url,
     source_id: sourceId,
   });
+  if (insertError) {
+    console.error("[DEDUP] Error recording new URL:", insertError);
+  }
 
   return false;
 }
@@ -214,6 +239,8 @@ export async function ingestFeed(source: FeedSource): Promise<IngestionResult> {
       items = await parseRSSFeed(source);
     } else if (source.feed_type === "scrape") {
       items = await scrapeFeed(source);
+    } else {
+      console.warn(`[INGEST] Unknown feed_type "${source.feed_type}" for source "${source.name}" — skipping. "api" type is not yet implemented.`);
     }
 
     result.items_processed = items.length;
@@ -316,7 +343,7 @@ export async function refreshAllFeeds(): Promise<RefreshResult> {
   const total_errors = results.reduce((sum, r) => sum + r.errors.length, 0);
 
   // Log to audit table
-  await supabaseAdmin.from("audit_log").insert({
+  const { error: auditError } = await supabaseAdmin.from("audit_log").insert({
     action: "cron_run",
     details: {
       feeds_processed: sources.length,
@@ -333,6 +360,9 @@ export async function refreshAllFeeds(): Promise<RefreshResult> {
     errors: total_errors,
     duration_ms: Date.now() - startTime,
   });
+  if (auditError) {
+    console.error("[AUDIT] Error writing audit log:", auditError);
+  }
 
   // Mark items older than 7 days as not new
   await supabaseAdmin

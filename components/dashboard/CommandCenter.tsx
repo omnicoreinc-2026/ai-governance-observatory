@@ -37,6 +37,7 @@ export function CommandCenter(): JSX.Element {
   const [totalAlerts, setTotalAlerts] = useState(0);
   const [criticalCount, setCriticalCount] = useState(0);
   const [newCount, setNewCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -63,11 +64,18 @@ export function CommandCenter(): JSX.Element {
             .eq("is_new", true),
         ]);
 
+      if (alertsRes.error) { console.error('Failed to fetch alerts:', alertsRes.error); setLoading(false); return; }
+      if (vendorsRes.error) { console.error('Failed to fetch vendors:', vendorsRes.error); setLoading(false); return; }
+      if (totalRes.error) { console.error('Failed to fetch total:', totalRes.error); setLoading(false); return; }
+      if (critRes.error) { console.error('Failed to fetch critical count:', critRes.error); setLoading(false); return; }
+      if (newRes.error) { console.error('Failed to fetch new count:', newRes.error); setLoading(false); return; }
+
       setAlerts(alertsRes.data ?? []);
       setVendors(vendorsRes.data ?? []);
       setTotalAlerts(totalRes.count ?? 0);
       setCriticalCount(critRes.count ?? 0);
       setNewCount(newRes.count ?? 0);
+      setLoading(false);
     }
     load();
   }, []);
@@ -91,11 +99,15 @@ export function CommandCenter(): JSX.Element {
     d.setMonth(d.getMonth() - (5 - i));
     return {
       month: d.toLocaleString("default", { month: "short" }),
-      alerts: Math.floor(Math.random() * 30) + 10 + i * 5,
+      alerts: 10 + i * 8,
     };
   });
 
   const criticalAlerts = alerts.filter((a) => a.severity === "critical");
+
+  if (loading) {
+    return <div className="py-12 text-center text-sm text-[#71717A]">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">

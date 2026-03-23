@@ -25,17 +25,24 @@ const STATUS_LABELS: Record<FrameworkStatus, string> = {
 
 export function FrameworksView(): JSX.Element {
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("frameworks")
         .select("*")
         .order("last_updated", { ascending: false });
+      if (error) { console.error('Failed to fetch frameworks:', error); setLoading(false); return; }
       setFrameworks(data ?? []);
+      setLoading(false);
     }
     load();
   }, []);
+
+  if (loading) {
+    return <div className="py-12 text-center text-sm text-[#71717A]">Loading...</div>;
+  }
 
   return (
     <div className="space-y-4">

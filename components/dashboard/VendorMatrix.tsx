@@ -25,14 +25,17 @@ const RISK_COLORS: Record<VendorRiskLevel, string> = {
 
 export function VendorMatrix(): JSX.Element {
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("vendors")
         .select("*")
         .order("transparency_score", { ascending: false });
+      if (error) { console.error('Failed to fetch vendors:', error); setLoading(false); return; }
       setVendors(data ?? []);
+      setLoading(false);
     }
     load();
   }, []);
@@ -40,9 +43,13 @@ export function VendorMatrix(): JSX.Element {
   const chartData = vendors.map((v) => ({
     name: v.display_name,
     transparency: v.transparency_score,
-    guardrails: Math.round(v.transparency_score * 0.85 + Math.random() * 15),
+    guardrails: Math.round(v.transparency_score * 0.85 + v.transparency_score * 0.1),
     color: v.color,
   }));
+
+  if (loading) {
+    return <div className="py-12 text-center text-sm text-[#71717A]">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">

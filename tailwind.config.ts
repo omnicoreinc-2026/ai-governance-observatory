@@ -1,3 +1,5 @@
+// NOTE: Tailwind v4 uses CSS-first configuration via @theme in app/globals.css.
+// This file is kept for editor IntelliSense (VS Code, WebStorm, etc.).
 import type { Config } from "tailwindcss";
 
 const config: Config = {

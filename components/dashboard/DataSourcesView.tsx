@@ -20,20 +20,27 @@ const STATUS_COLORS = {
 
 export function DataSourcesView(): JSX.Element {
   const [sources, setSources] = useState<FeedSource[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("feed_sources")
         .select("*")
         .order("name");
+      if (error) { console.error('Failed to fetch feed sources:', error); setLoading(false); return; }
       setSources(data ?? []);
+      setLoading(false);
     }
     load();
   }, []);
 
   const activeCount = sources.filter((s) => s.status === "active").length;
   const errorCount = sources.filter((s) => s.status === "error").length;
+
+  if (loading) {
+    return <div className="py-12 text-center text-sm text-[#71717A]">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">

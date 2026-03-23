@@ -141,6 +141,7 @@ CREATE TABLE timeline_events (
 );
 
 CREATE INDEX idx_timeline_date ON timeline_events(event_date);
+CREATE INDEX idx_timeline_event_type ON timeline_events(event_type);
 
 -- Audit Log: Track all cron job runs and data changes
 CREATE TABLE audit_log (
@@ -189,6 +190,8 @@ CREATE TRIGGER trg_frameworks_updated BEFORE UPDATE ON frameworks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER trg_feed_sources_updated BEFORE UPDATE ON feed_sources
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_timeline_updated BEFORE UPDATE ON timeline_events
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Priority scoring function
 CREATE OR REPLACE FUNCTION compute_priority_score(
@@ -208,6 +211,7 @@ BEGIN
     WHEN 'medium' THEN 45
     WHEN 'low' THEN 20
     WHEN 'info' THEN 5
+    ELSE 0
   END;
 
   -- Category boost
@@ -218,6 +222,7 @@ BEGIN
     WHEN 'safety_research' THEN 5
     WHEN 'frameworks' THEN 3
     WHEN 'standards' THEN 2
+    ELSE 0
   END;
 
   -- Recency decay (lose points as items age)
@@ -266,26 +271,31 @@ ALTER TABLE frameworks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE feed_sources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE timeline_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ingested_urls ENABLE ROW LEVEL SECURITY;
 
 -- Public read access for all content tables
 CREATE POLICY "Public read alerts" ON alerts FOR SELECT USING (true);
 CREATE POLICY "Public read vendors" ON vendors FOR SELECT USING (true);
 CREATE POLICY "Public read frameworks" ON frameworks FOR SELECT USING (true);
 CREATE POLICY "Public read timeline" ON timeline_events FOR SELECT USING (true);
+CREATE POLICY "Public read feed_sources" ON feed_sources FOR SELECT USING (true);
+CREATE POLICY "Public read audit_log" ON audit_log FOR SELECT USING (true);
 
 -- Service role only for writes (cron jobs use service key)
 CREATE POLICY "Service write alerts" ON alerts FOR ALL
-  USING (auth.role() = 'service_role');
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service write vendors" ON vendors FOR ALL
-  USING (auth.role() = 'service_role');
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service write frameworks" ON frameworks FOR ALL
-  USING (auth.role() = 'service_role');
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service write feed_sources" ON feed_sources FOR ALL
-  USING (auth.role() = 'service_role');
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service write timeline" ON timeline_events FOR ALL
-  USING (auth.role() = 'service_role');
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service write audit" ON audit_log FOR ALL
-  USING (auth.role() = 'service_role');
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+CREATE POLICY "Service write ingested_urls" ON ingested_urls FOR ALL
+  USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 
 -- =============================================================================
 -- VIEWS

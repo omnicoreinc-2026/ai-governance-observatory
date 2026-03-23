@@ -31,9 +31,9 @@ export async function GET(): Promise<NextResponse> {
       last_cron: auditRes.data?.[0] ?? null,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+    console.error("[HEALTH] Unexpected error:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
-      { status: "error", message },
+      { status: "error", message: "Internal server error" },
       { status: 500 }
     );
   }

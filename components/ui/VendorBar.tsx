@@ -1,5 +1,3 @@
-"use client";
-
 interface VendorBarProps {
   label: string;
   value: number;

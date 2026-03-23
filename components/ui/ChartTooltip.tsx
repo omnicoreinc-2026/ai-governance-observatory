@@ -1,5 +1,3 @@
-"use client";
-
 interface ChartTooltipProps {
   active?: boolean;
   payload?: Array<{ name: string; value: number; color: string }>;
