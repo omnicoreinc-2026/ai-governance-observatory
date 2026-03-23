@@ -156,6 +156,47 @@ const feedSources = [
     default_severity: "medium",
     frequency_hours: 6,
   },
+  // Government / Regulatory
+  { name: "EU Digital Strategy", feed_type: "rss", url: "https://digital-strategy.ec.europa.eu/en/rss.xml", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "UK DSIT – AI & Innovation News", feed_type: "rss", url: "https://www.gov.uk/search/news-and-communications.atom?keywords=artificial+intelligence&organisations[]=department-for-science-innovation-and-technology", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "UK AI Safety Institute", feed_type: "rss", url: "https://www.gov.uk/search/news-and-communications.atom?keywords=artificial+intelligence&organisations[]=ai-safety-institute", default_category: "safety_research", default_severity: "critical", frequency_hours: 6 },
+  { name: "White House Presidential Actions", feed_type: "rss", url: "https://www.whitehouse.gov/presidential-actions/feed/", default_category: "regulatory", default_severity: "critical", frequency_hours: 6 },
+  { name: "Federal Register – AI Rules", feed_type: "rss", url: "https://www.federalregister.gov/api/v1/articles.rss?conditions[term]=artificial+intelligence&conditions[type][]=RULE&conditions[type][]=PRULE&conditions[type][]=NOTICE", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "EU AI Act Tracker", feed_type: "rss", url: "https://artificialintelligenceact.eu/feed/", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "FedScoop", feed_type: "rss", url: "https://fedscoop.com/feed/", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "StateScoop", feed_type: "rss", url: "https://statescoop.com/feed/", default_category: "regulatory", default_severity: "medium", frequency_hours: 12 },
+  // AI Safety Research
+  { name: "AI Now Institute", feed_type: "rss", url: "https://ainowinstitute.org/feed/", default_category: "safety_research", default_severity: "high", frequency_hours: 24 },
+  { name: "AI Alignment Forum", feed_type: "rss", url: "https://www.alignmentforum.org/feed.xml", default_category: "safety_research", default_severity: "high", frequency_hours: 12 },
+  { name: "AI Incident Database", feed_type: "rss", url: "https://incidentdatabase.ai/rss.xml", default_category: "enforcement", default_severity: "high", frequency_hours: 12 },
+  { name: "Ada Lovelace Institute", feed_type: "rss", url: "https://www.adalovelaceinstitute.org/feed/", default_category: "safety_research", default_severity: "medium", frequency_hours: 24 },
+  { name: "CSET Georgetown", feed_type: "rss", url: "https://cset.georgetown.edu/feed/", default_category: "safety_research", default_severity: "high", frequency_hours: 24 },
+  { name: "Data & Society", feed_type: "rss", url: "https://datasociety.net/feed/", default_category: "safety_research", default_severity: "medium", frequency_hours: 24 },
+  { name: "AI as Normal Technology (Princeton)", feed_type: "rss", url: "https://www.normaltech.ai/feed", default_category: "safety_research", default_severity: "medium", frequency_hours: 24 },
+  // Legal / Policy Think Tanks
+  { name: "Center for Democracy & Technology", feed_type: "rss", url: "https://cdt.org/feed/", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "EPIC", feed_type: "rss", url: "https://epic.org/feed/", default_category: "enforcement", default_severity: "high", frequency_hours: 12 },
+  { name: "Electronic Frontier Foundation", feed_type: "rss", url: "https://www.eff.org/rss/updates.xml", default_category: "regulatory", default_severity: "medium", frequency_hours: 12 },
+  { name: "Access Now", feed_type: "rss", url: "https://www.accessnow.org/feed/", default_category: "enforcement", default_severity: "high", frequency_hours: 24 },
+  { name: "AlgorithmWatch", feed_type: "rss", url: "https://algorithmwatch.org/en/feed/", default_category: "enforcement", default_severity: "high", frequency_hours: 24 },
+  { name: "Future of Privacy Forum", feed_type: "rss", url: "https://fpf.org/feed/", default_category: "regulatory", default_severity: "medium", frequency_hours: 24 },
+  { name: "Responsible AI Institute", feed_type: "rss", url: "https://www.responsible.ai/feed/", default_category: "frameworks", default_severity: "medium", frequency_hours: 24 },
+  { name: "Montreal AI Ethics Institute", feed_type: "rss", url: "https://brief.montrealethics.ai/feed", default_category: "frameworks", default_severity: "medium", frequency_hours: 24 },
+  { name: "RAND Commentary", feed_type: "rss", url: "https://www.rand.org/blog.xml", default_category: "frameworks", default_severity: "medium", frequency_hours: 24 },
+  { name: "AI Regulation (ai-regulation.com)", feed_type: "rss", url: "https://ai-regulation.com/feed/", default_category: "regulatory", default_severity: "high", frequency_hours: 24 },
+  { name: "Hunton Privacy & Cybersecurity Blog", feed_type: "rss", url: "https://www.hunton.com/privacy-and-cybersecurity-law-blog/feed/", default_category: "regulatory", default_severity: "medium", frequency_hours: 24 },
+  // Vendor Blogs
+  { name: "OpenAI News", feed_type: "rss", url: "https://openai.com/news/rss", default_category: "vendor_guardrails", default_severity: "high", frequency_hours: 6 },
+  { name: "Microsoft On the Issues", feed_type: "rss", url: "https://blogs.microsoft.com/on-the-issues/feed/", default_category: "vendor_guardrails", default_severity: "medium", frequency_hours: 12 },
+  { name: "Google AI Blog", feed_type: "rss", url: "https://blog.google/technology/ai/rss/", default_category: "vendor_guardrails", default_severity: "medium", frequency_hours: 12 },
+  // News & Analysis
+  { name: "TechCrunch – AI Policy", feed_type: "rss", url: "https://techcrunch.com/tag/ai-policy/feed/", default_category: "regulatory", default_severity: "medium", frequency_hours: 6 },
+  { name: "MIT Technology Review – AI", feed_type: "rss", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed", default_category: "safety_research", default_severity: "medium", frequency_hours: 12 },
+  { name: "MIT Technology Review – Policy", feed_type: "rss", url: "https://www.technologyreview.com/topic/policy/feed", default_category: "regulatory", default_severity: "high", frequency_hours: 12 },
+  { name: "IEEE Spectrum – AI", feed_type: "rss", url: "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss", default_category: "standards", default_severity: "medium", frequency_hours: 12 },
+  { name: "AI News", feed_type: "rss", url: "https://www.artificialintelligence-news.com/feed/", default_category: "regulatory", default_severity: "medium", frequency_hours: 12 },
+  { name: "LSE Media Blog", feed_type: "rss", url: "https://blogs.lse.ac.uk/medialse/feed/", default_category: "frameworks", default_severity: "low", frequency_hours: 24 },
+  { name: "AIAAIC Repository (AI Incidents)", feed_type: "scrape", url: "https://www.aiaaic.org/aiaaic-repository", scrape_selector: "article, h3, h2", default_category: "enforcement", default_severity: "high", frequency_hours: 24 },
 ];
 
 // =============================================================================
