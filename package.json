@@ -1,0 +1,39 @@
+{
+  "name": "ai-governance-observatory",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-time AI governance intelligence platform tracking regulations, vendor guardrails, and safety frameworks",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "npx supabase db push",
+    "db:seed": "npx tsx scripts/seed.ts",
+    "cron:refresh": "npx tsx scripts/cron-refresh.ts",
+    "cron:score": "npx tsx scripts/recompute-scores.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "cheerio": "^1.0.0",
+    "crypto-js": "^4.2.0",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.383.0",
+    "next": "^15.5.14",
+    "node-cron": "^3.0.3",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-is": "^19.2.4",
+    "recharts": "^3.8.0",
+    "rss-parser": "^3.13.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}
