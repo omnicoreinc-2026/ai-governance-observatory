@@ -191,11 +191,14 @@ const SevBadge = ({ sev, size = "sm" }: { sev: string; size?: string }) => {
   );
 };
 
-const Metric = ({ label, value, sub, accent, icon: Icon, trend }: { label: string; value: number | string; sub?: string; accent?: string; icon?: any; trend?: string }) => (
-  <div className="ao-card" style={{ padding: "20px 22px", flex: 1, minWidth: 170 }}>
+const Metric = ({ label, value, sub, accent, icon: Icon, trend, onClick }: { label: string; value: number | string; sub?: string; accent?: string; icon?: any; trend?: string; onClick?: () => void }) => (
+  <div className="ao-card" onClick={onClick} style={{ padding: "20px 22px", flex: 1, minWidth: 170, cursor: onClick ? "pointer" : "default", transition: "border-color 0.2s, transform 0.15s, background 0.2s" }}
+    onMouseEnter={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(56,189,248,0.3)"; (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; } }}
+    onMouseLeave={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = ""; (e.currentTarget as HTMLDivElement).style.transform = ""; } }}
+  >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
       <span className="ao-label">{label}</span>
-      {Icon && <Icon size={15} style={{ color: "var(--text-3)", opacity: 0.5 }} />}
+      {Icon && <Icon size={15} style={{ color: onClick ? accent || "var(--accent)" : "var(--text-3)", opacity: onClick ? 0.7 : 0.5 }} />}
     </div>
     <div style={{ fontSize: 32, fontWeight: 800, color: accent || "var(--text-0)", fontFamily: "var(--display)", lineHeight: 1, letterSpacing: "-0.02em" }}>{value}</div>
     {sub && (
@@ -203,6 +206,7 @@ const Metric = ({ label, value, sub, accent, icon: Icon, trend }: { label: strin
         {trend === "up" && <ArrowUpRight size={12} style={{ color: "#EF4444" }} />}
         {trend === "down" && <ArrowDownRight size={12} style={{ color: "#10B981" }} />}
         <span style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--mono)" }}>{sub}</span>
+        {onClick && <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--accent)", fontFamily: "var(--mono)", opacity: 0.6 }}>view →</span>}
       </div>
     )}
   </div>
@@ -354,11 +358,11 @@ export default function Page() {
             <p style={{ fontSize: 13, color: "var(--text-3)" }}>AI governance intelligence across {VENDORS_DATA.length} vendors, {FRAMEWORKS.length} frameworks, and {FEEDS.length} data sources.</p>
           </div>
           <div className="ao-enter ao-enter-1" style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
-            <Metric label="Active Alerts" value={ALERTS.length} sub="across all categories" icon={Bell} accent="var(--accent)" />
-            <Metric label="Critical" value={critCount} sub="+2 this week" icon={AlertTriangle} accent="#EF4444" trend="up" />
-            <Metric label="High Priority" value={ALERTS.filter(a=>a.sev==="high").length} sub="requires attention" icon={Zap} accent="#F59E0B" />
-            <Metric label="New Items" value={newCount} sub="since last review" icon={Radio} accent="#8B5CF6" />
-            <Metric label="Frameworks" value={FRAMEWORKS.length} sub="tracked globally" icon={Layers} accent="var(--text-2)" />
+            <Metric label="Active Alerts" value={ALERTS.length} sub="across all categories" icon={Bell} accent="var(--accent)" onClick={() => { setSevFilter("all"); setCatFilter("all"); setShowNew(false); setView("alerts"); }} />
+            <Metric label="Critical" value={critCount} sub="+2 this week" icon={AlertTriangle} accent="#EF4444" trend="up" onClick={() => { setSevFilter("critical"); setCatFilter("all"); setShowNew(false); setView("alerts"); }} />
+            <Metric label="High Priority" value={ALERTS.filter(a=>a.sev==="high").length} sub="requires attention" icon={Zap} accent="#F59E0B" onClick={() => { setSevFilter("high"); setCatFilter("all"); setShowNew(false); setView("alerts"); }} />
+            <Metric label="New Items" value={newCount} sub="since last review" icon={Radio} accent="#8B5CF6" onClick={() => { setSevFilter("all"); setCatFilter("all"); setShowNew(true); setView("alerts"); }} />
+            <Metric label="Frameworks" value={FRAMEWORKS.length} sub="tracked globally" icon={Layers} accent="var(--text-2)" onClick={() => setView("frameworks")} />
           </div>
           {critCount > 0 && (<div className="ao-enter ao-enter-2" style={{ background: "linear-gradient(135deg, rgba(239,68,68,0.06) 0%, rgba(239,68,68,0.02) 100%)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "var(--radius)", padding: 22, marginBottom: 24 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
