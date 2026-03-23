@@ -607,14 +607,6 @@ export default function Page() {
               </div>
             ))}
           </div>
-          <div className="ao-card ao-enter ao-enter-2" style={{ padding: 24, background: "linear-gradient(135deg, rgba(56,189,248,0.03) 0%, rgba(56,189,248,0.01) 100%)", borderColor: "rgba(56,189,248,0.1)" }}>
-            <div className="ao-label" style={{ color: "var(--accent)", marginBottom: 14 }}>Architecture</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24, fontSize: 13, color: "var(--text-2)", lineHeight: 1.7 }}>
-              <div><div style={{ fontWeight: 700, color: "var(--text-0)", marginBottom: 6, fontSize: 12, fontFamily: "var(--mono)" }}>Stack</div>Next.js 14 + React 18<br/>Supabase PostgreSQL + RLS<br/>Vercel Cron (2x/day)<br/>Recharts, Lucide, Tailwind v4</div>
-              <div><div style={{ fontWeight: 700, color: "var(--text-0)", marginBottom: 6, fontSize: 12, fontFamily: "var(--mono)" }}>Ingestion</div>RSS Parser + Cheerio scraper<br/>Keyword severity scoring<br/>Auto vendor/category detection<br/>SHA-256 URL deduplication</div>
-              <div><div style={{ fontWeight: 700, color: "var(--text-0)", marginBottom: 6, fontSize: 12, fontFamily: "var(--mono)" }}>Cost Model</div>Vercel Hobby: $0/mo<br/>Supabase Free: $0/mo<br/>Zero paid API dependencies<br/>All feeds: RSS or scrape</div>
-            </div>
-          </div>
         </div>)}
       </main>
     </div>
