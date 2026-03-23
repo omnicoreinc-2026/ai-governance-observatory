@@ -324,8 +324,8 @@ export default function Page() {
       <aside style={{ width: 240, flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", padding: "0 12px", background: "var(--surface-0)" }}>
         <div style={{ padding: "20px 14px 24px", borderBottom: "1px solid var(--border)", marginBottom: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Shield size={16} color="#09090B" strokeWidth={2.5} />
+            <div style={{ width: 34, height: 34, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
+              <img src="/logo.png" alt="AI Governance Observatory" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div>
               <div style={{ fontFamily: "var(--display)", fontWeight: 800, fontSize: 14, color: "var(--text-0)", letterSpacing: "-0.02em" }}>Governance</div>
